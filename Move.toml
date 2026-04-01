@@ -1,0 +1,13 @@
+[package]
+name = "smartshelters"
+version = "1.0.0"
+edition = "2024.beta"
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "main" }
+World = { local = "../world-contracts" }
+
+[addresses]
+smartshelters = "0x0"
+sui = "0x2"
+world = "0x0"  # Must be updated with the actual World package ID on Stillness
