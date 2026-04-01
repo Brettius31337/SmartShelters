@@ -1,8 +1,6 @@
 function App() {
   const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
   const tx = new TransactionBlock();
-
-  const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
   console.log('SuiClient initialized:', client);
 
   return (
