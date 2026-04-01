@@ -1,5 +1,5 @@
 import { ConnectButton } from '@mysten/dapp-kit';
-import { TransactionBlock } from '@mysten/sui/transactions';
+import { TransactionBlock } from '@mysten/sui';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { useState, useEffect, useCallback } from 'react';
 
