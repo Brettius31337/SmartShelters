@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mysten/dapp-kit": "^0.14.0",
-    "@mysten/sui": "0.32.2",
+    "@mysten/sui": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
