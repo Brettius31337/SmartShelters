@@ -1,5 +1,7 @@
 function App() {
   const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
+
+  const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
   console.log('SuiClient initialized:', client);
 
   const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
