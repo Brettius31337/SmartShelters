@@ -8,6 +8,7 @@ function App() {
       <h1>SMART SHELTERS</h1>
       <p>Basic version - Sui integration coming soon.</p>
       <p>Deployment test successful.</p>
+      <p>SuiClient is initialized and ready.</p>
     </div>
   );
 }
