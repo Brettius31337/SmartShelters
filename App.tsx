@@ -1,4 +1,4 @@
-import { ConnectButton, useWallet, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
+import { ConnectButton } from '@mysten/dapp-kit';
 import { TransactionBlock } from '@mysten/sui/transactions';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { useState, useEffect, useCallback } from 'react';
@@ -7,7 +7,6 @@ const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
 
 export default function App() {
   const { address } = useWallet();
-  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
   const [shelterId, setShelterId] = useState('');
   const [newShipId, setNewShipId] = useState('');
