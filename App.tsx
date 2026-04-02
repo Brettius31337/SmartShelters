@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ConnectButton, useWallet, useSuiClient } from '@mysten/dapp-kit';
-import { getFullnodeUrl } from '@mysten/sui/client';
+import { ConnectButton, useCurrentAccount, useSuiClient } from '@mysten/dapp-kit';
 
 function App() {
   const [shelters, setShelters] = useState([]);
@@ -9,20 +8,20 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const wallet = useWallet();
+  const account = useCurrentAccount();
   const client = useSuiClient();
 
   // Auto-load user's shelters when wallet connects
   useEffect(() => {
     const fetchOwnedShelters = async () => {
-      if (!wallet.connected || !wallet.currentAccount) return;
+      if (!account) return;
 
       setLoading(true);
       setError('');
 
       try {
         const result = await client.getOwnedObjects({
-          owner: wallet.currentAccount.address,
+          owner: account.address,
           filter: {
             StructType: '0x0::smartshelters::smartshelters::SmartShelter'
           },
@@ -68,6 +67,8 @@ function App() {
       <p style={{ color: '#666', marginBottom: '30px' }}>EVE FRONTIER CIVILIZATION TOOLKIT</p>
 
       <ConnectButton />
+
+      {account && <div style={{marginTop:'10px', color:'#0a0'}}>Connected: {account.address.slice(0,8)}...{account.address.slice(-6)}</div>}
 
       {wallet.connected && (
         <div style={{ marginTop: '30px', width: '100%', maxWidth: '700px' }}>
@@ -127,7 +128,7 @@ function App() {
         </div>
       )}
 
-      {!wallet.connected && (
+      {!account && (
         <div style={{marginTop: '40px', color:'#555', textAlign:'center'}}>
           Connect your Sui wallet to automatically load your SmartShelters<br/>
           (no manual ID entry required)
