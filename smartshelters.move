@@ -3,8 +3,8 @@ module smartshelters::smartshelters {
     use sui::tx_context::{Self, TxContext};
     use sui::transfer;
     use sui::event;
-    use world::assembly::{Self, Assembly};
-    use world::access::OwnerCap;
+    # use world::assembly::{Self, Assembly}; // Stub for build
+    # use world::access::OwnerCap; // Stub
 
     struct SmartShelter has key {
         id: UID,
@@ -58,7 +58,9 @@ module smartshelters::smartshelters {
         owner_cap: &OwnerCap<Assembly>,
         ctx: &mut TxContext
     ) {
-        // Official anchor logic would go here
+        // TODO: Impl real anchor + tribe/standing checks:
+    // - world::tribe::is_member(ctx, shelter.tribe_id, sender)
+    // - standing::tier(shelter.standings, sender) >= required_for(ship_tier)
         // This is a stub for compatibility
     }
 }

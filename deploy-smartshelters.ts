@@ -12,7 +12,7 @@ const keypair = Ed25519Keypair.fromSecretKey(secretKey);
 
 async function main() {
   // Stillness uses the mainnet/fullnode for live EVE Frontier
-  const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
+  const client = new SuiClient({ url: getFullnodeUrl('testnet') }); // Hack testnet safe
 
   try {
     console.log('🚀 Creating SmartShelter on Sui testnet...');

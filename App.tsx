@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
-import { ConnectButton, useCurrentAccount, useSuiClient } from '@mysten/dapp-kit';
+import { ConnectButton, useCurrentAccount, useSuiClient, useExecuteTransaction } from '@mysten/dapp-kit';
+import { TransactionBlock } from '@mysten/sui/transactions';
 
 function App() {
   const [shelters, setShelters] = useState([]);
   const [selectedShelter, setSelectedShelter] = useState(null);
   const [ships, setShips] = useState([]);
+  const [shipId, setShipId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const account = useCurrentAccount();
   const client = useSuiClient();
+  const { mutate: executeTx } = useExecuteTransaction();
 
   // Auto-load user's shelters when wallet connects
   useEffect(() => {
@@ -54,9 +57,60 @@ function App() {
       }
       setLoading(false);
     };
+  }, [account?.address, client]);
 
-    fetchOwnedShelters();
-  }, [wallet.connected, wallet.currentAccount, client]);
+  async function depositShip() {
+    if (!selectedShelter || !shipId) {
+      setError('Select shelter and enter ship ID');
+      return;
+    }
+    setError('');
+    const tx = new TransactionBlock();
+    tx.moveCall({
+      target: '0x0::smartshelters::smartshelters::swap_ship',
+      arguments: [
+        tx.object(selectedShelter.id),
+        tx.pure(shipId),
+        tx.pure(true)
+      ],
+    });
+    try {
+      const result = await executeTx({
+        transactionBlock: tx,
+      });
+      console.log('Deposit:', result);
+      // Refetch
+      fetchOwnedShelters();
+    } catch (err) {
+      setError('Deposit failed: ' + (err.message || err));
+    }
+  }
+
+  async function withdrawShip() {
+    if (!selectedShelter || !shipId || !ships.includes(shipId)) {
+      setError('Ship not in shelter or missing');
+      return;
+    }
+    setError('');
+    const tx = new TransactionBlock();
+    tx.moveCall({
+      target: '0x0::smartshelters::smartshelters::swap_ship',
+      arguments: [
+        tx.object(selectedShelter.id),
+        tx.pure(shipId),
+        tx.pure(false)
+      ],
+    });
+    try {
+      const result = await executeTx({
+        transactionBlock: tx,
+      });
+      console.log('Withdraw:', result);
+      fetchOwnedShelters();
+    } catch (err) {
+      setError('Withdraw failed: ' + (err.message || err));
+    }
+  }
 
   return (
     <div style={{ 
@@ -117,6 +171,23 @@ function App() {
                 {ships.length === 0 ? (
                   <div>No ships stored yet.</div>
                 ) : (
+                  <>
+                    <div style={{marginBottom: '15px'}}>
+                      <input 
+                        value={shipId}
+                        onChange={(e) => setShipId(e.target.value)}
+                        placeholder="Enter ship address"
+                        style={{ padding: '8px', width: '70%', marginRight: '10px', background: '#1a1a1a', color: '#0f0', border: '1px solid #0f0' }}
+                      />
+                      <button 
+                        onClick={() => depositShip()}
+                        style={{ padding: '8px 16px', background: '#00ff9f', color: '#000', border: 'none', cursor: 'pointer' }}
+                      >Deposit</button>
+                      <button 
+                        onClick={() => withdrawShip()}
+                        style={{ padding: '8px 16px', background: '#ff4d4d', color: '#fff', border: 'none', cursor: 'pointer', marginLeft: '10px' }}
+                      >Withdraw</button>
+                    </div>
                   ships.map((ship, i) => (
                     <div key={i} style={{ 
                       margin: '8px 0', 

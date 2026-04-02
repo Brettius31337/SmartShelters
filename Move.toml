@@ -5,9 +5,9 @@ edition = "2024.beta"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "main" }
-World = { local = "../world-contracts" }
+# World = { local = "../world-contracts" }  // Stub for hack
 
 [addresses]
 smartshelters = "0x0"
 sui = "0x2"
-world = "0x0"  # Must be updated with the actual World package ID on Stillness
+# world = "0x0"
