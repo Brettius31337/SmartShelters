@@ -1,57 +1,138 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { ConnectButton, useWallet, useSuiClient } from '@mysten/dapp-kit';
+import { getFullnodeUrl } from '@mysten/sui/client';
 
 function App() {
-  const [shelterId, setShelterId] = useState('');
+  const [shelters, setShelters] = useState([]);
+  const [selectedShelter, setSelectedShelter] = useState(null);
   const [ships, setShips] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const loadShips = async () => {
-    if (!shelterId) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/shelter?shelterId=${shelterId}`);
-      const data = await res.json();
-      setShips(data.data || []);
-    } catch (e) {
-      console.error(e);
-    }
-    setLoading(false);
-  };
+  const wallet = useWallet();
+  const client = useSuiClient();
+
+  // Auto-load user's shelters when wallet connects
+  useEffect(() => {
+    const fetchOwnedShelters = async () => {
+      if (!wallet.connected || !wallet.currentAccount) return;
+
+      setLoading(true);
+      setError('');
+
+      try {
+        const result = await client.getOwnedObjects({
+          owner: wallet.currentAccount.address,
+          filter: {
+            StructType: '0x0::smartshelters::smartshelters::SmartShelter'
+          },
+          options: { showContent: true }
+        });
+
+        const owned = result.data.map(obj => ({
+          id: obj.data.objectId,
+          ships: obj.data.content?.fields?.ships || []
+        }));
+
+        setShelters(owned);
+
+        if (owned.length === 1) {
+          setSelectedShelter(owned[0]);
+          setShips(owned[0].ships);
+        } else if (owned.length > 1) {
+          setSelectedShelter(owned[0]);
+          setShips(owned[0].ships);
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load shelters. Make sure you are connected to the correct network.');
+      }
+      setLoading(false);
+    };
+
+    fetchOwnedShelters();
+  }, [wallet.connected, wallet.currentAccount, client]);
 
   return (
     <div style={{ 
       padding: '40px', 
       fontFamily: 'monospace', 
-      color: 'lime', 
-      backgroundColor: 'black', 
+      color: '#00ff9f', 
+      backgroundColor: '#0a0a0a', 
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center'
+      alignItems: 'center'
     }}>
-      <h1 style={{ fontSize: '3rem' }}>SMART SHELTERS</h1>
-      <input 
-        type="text" 
-        placeholder="Enter Shelter ID" 
-        value={shelterId} 
-        onChange={(e) => setShelterId(e.target.value)}
-        style={{ width: '80%', padding: '10px', margin: '20px 0', fontSize: '1rem' }}
-      />
-      <button onClick={loadShips} style={{ padding: '10px 20px', marginBottom: '20px' }}>
-        Load Ships from Shelter
-      </button>
-      <div>
-        {loading ? 'Loading...' : `Ships in shelter: ${ships.length}`}
-      </div>
-      <div style={{ marginTop: '20px' }}>
-        {ships.map((ship, i) => (
-          <div key={i} style={{ margin: '10px 0', padding: '10px', backgroundColor: '#111', width: '80%' }}>
-            {ship}
-          </div>
-        ))}
-      </div>
-      <p style={{ fontSize: '1rem', marginTop: '20px', color: '#666' }}>Sui integration via backend API</p>
+      <h1 style={{ fontSize: '3.2rem', marginBottom: '10px', letterSpacing: '4px' }}>SMART SHELTERS</h1>
+      <p style={{ color: '#666', marginBottom: '30px' }}>EVE FRONTIER CIVILIZATION TOOLKIT</p>
+
+      <ConnectButton />
+
+      {wallet.connected && (
+        <div style={{ marginTop: '30px', width: '100%', maxWidth: '700px' }}>
+          {loading && <div>Loading your shelters...</div>}
+          {error && <div style={{color:'red'}}>{error}</div>}
+
+          {shelters.length === 0 && !loading && (
+            <div>No SmartShelters found in this wallet.</div>
+          )}
+
+          {shelters.length > 0 && (
+            <div>
+              <div style={{marginBottom: '15px'}}>
+                Owned Shelters: {shelters.length}
+              </div>
+
+              <select 
+                value={selectedShelter?.id || ''}
+                onChange={(e) => {
+                  const shelter = shelters.find(s => s.id === e.target.value);
+                  if (shelter) {
+                    setSelectedShelter(shelter);
+                    setShips(shelter.ships);
+                  }
+                }}
+                style={{ width: '100%', padding: '12px', background: '#111', color: '#0f0', border: '1px solid #0f0', marginBottom: '20px' }}
+              >
+                {shelters.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {s.id.slice(0,8)}...{s.id.slice(-6)} ({s.ships.length} ships)
+                  </option>
+                ))}
+              </select>
+
+              <div style={{ background: '#111', padding: '20px', border: '1px solid #0f0' }}>
+                <h3>Ships in Shelter</h3>
+                <div style={{ color: '#aaa', marginBottom: '15px' }}>
+                  Object ID: <span style={{color:'#0f0'}}>{selectedShelter?.id}</span>
+                </div>
+                {ships.length === 0 ? (
+                  <div>No ships stored yet.</div>
+                ) : (
+                  ships.map((ship, i) => (
+                    <div key={i} style={{ 
+                      margin: '8px 0', 
+                      padding: '12px', 
+                      backgroundColor: '#1a1a1a', 
+                      borderLeft: '3px solid #00ff9f' 
+                    }}>
+                      Ship {i+1}: {ship}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!wallet.connected && (
+        <div style={{marginTop: '40px', color:'#555', textAlign:'center'}}>
+          Connect your Sui wallet to automatically load your SmartShelters<br/>
+          (no manual ID entry required)
+        </div>
+      )}
     </div>
   );
 }
