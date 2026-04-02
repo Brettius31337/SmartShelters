@@ -14,7 +14,13 @@ function App() {
   // Auto-load user's shelters when wallet connects
   useEffect(() => {
     const fetchOwnedShelters = async () => {
-      if (!account) return;
+      if (!account) {
+        setShelters([]);
+        setSelectedShelter(null);
+        setShips([]);
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       setError('');
