@@ -10,5 +10,16 @@ export default defineConfig({
         warn(warning)
       }
     }
+  },
+  resolve: {
+    conditions: ['browser']
+  },
+  optimizeDeps: {
+    include: ['@mysten/sui', '@mysten/dapp-kit'],
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
   }
 })
