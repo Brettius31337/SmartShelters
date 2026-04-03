@@ -4,10 +4,8 @@ import { Transaction } from '@mysten/sui/transactions';
 
 function App() {
   // Path B: DApp hosted on Smart Storage Unit, controlling Shelter(s)
-  // Currently configured for testnet
   const STORAGE_UNIT_ID = '0xd27c1b6100ae66ad297be3c74702dee0aef82f337a016e104b9e22aba0ee11d1';
   const DEFAULT_SHELTER_ID = '0xa5bf5396398cec9433e63019235174a0461b09952c73da71b96eb3b9e6e9091a';
-  const PACKAGE_ID = '0x39cb3449543709db204aa56cc88c87d12cf81fa5976c0e63c16cf34a30a228c9'; // Testnet
 
   const [controlledShelterId, setControlledShelterId] = useState(() => {
     return localStorage.getItem('controlledShelterId') || DEFAULT_SHELTER_ID;
@@ -91,7 +89,7 @@ function App() {
     setError('');
     const tx = new Transaction();
     tx.moveCall({
-      target: `${PACKAGE_ID}::smartshelters::swap_ship_on_assembly`,
+      target: '0x0::smartshelters::smartshelters::swap_ship_on_assembly',
       arguments: [
         tx.object(controlledShelterId),
         tx.pure(shipId),
@@ -115,7 +113,7 @@ function App() {
     setError('');
     const tx = new Transaction();
     tx.moveCall({
-      target: `${PACKAGE_ID}::smartshelters::swap_ship_on_assembly`,
+      target: '0x0::smartshelters::smartshelters::swap_ship_on_assembly',
       arguments: [
         tx.object(controlledShelterId),
         tx.pure(shipId),
