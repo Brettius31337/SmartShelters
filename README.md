@@ -1,92 +1,53 @@
-\# SmartShelters — EVE Frontier × Sui 2026 Hackathon Entry
+# SmartShelters — EVE Frontier × Sui
 
+**A tribe-agnostic Smart Assembly for secure ship storage in Shelters & Heavy Shelters.**
 
+Built for the EVE Frontier ecosystem after the Sui migration (March 2026).
 
-\*\*A tribe-agnostic Smart Assembly for ship swapping in Shelters \& Heavy Shelters\*\*
+## What it does
 
+- Anyone can create a **Smart Shelter** (no manual tribe input required).
+- Automatically detects the owner's current tribe using official `world::tribe`.
+- Tiered access based on **personal standings** set by the shelter owner:
+  - Basic tribe members → Shuttles / Corvettes
+  - Good standing → + Frigates
+  - Excellent standing → + Destroyers, Cruisers, Battlecruisers
+- Shelter **owner** always has full access to all stored ships.
+- All logic (including standing checks) happens on-chain in a single transaction.
+- Supports both standard Shelters and Heavy Shelters.
 
+Ships can be deposited and withdrawn using the clean React frontend.
 
-\*\*Theme:\*\* "A Toolkit for Civilization"  
+## Features
 
-\*\*Category:\*\* Utility + Live Frontier Integration
+- Fully on-chain access control using official EVE Frontier contracts
+- Automatic loading of owned shelters when wallet connects
+- Simple deposit/withdraw UI with real-time feedback
+- Compatible with zkLogin and sponsored transactions
+- Clean, dark sci-fi UI styled for the Frontier
 
+## Tech Stack
 
+- **Smart Contract**: Sui Move (Smart Assembly)
+- **Frontend**: React + TypeScript + Vite
+- **Wallet & Blockchain**: `@mysten/dapp-kit` + `@mysten/sui`
+- **Styling**: Inline + custom dark theme
+- **Deployment**: Vercel (auto-deploys on push to `main`)
 
-\## What it does
+## How to Test / Deploy
 
-\- Anyone can create a Smart Shelter (no manual tribe input).
+1. Clone the repo
+2. `npm install`
+3. `npm run dev` for local development
+4. Deploy the Move module using the deploy script
+5. Push to GitHub → automatic Vercel deployment
 
-\- Automatically ties to the owner's current tribe (official `world::tribe`).
+Live Demo: https://smart-shelters-8nz70k015-brettius31337s-projects.vercel.app/
 
-\- Tiered access based on \*\*personal standings the owner has set\*\*:
+## Live Demo
 
-&#x20; - Tribe member only → Shuttles / Corvettes
+https://smart-shelters-8nz70k015-brettius31337s-projects.vercel.app/
 
-&#x20; - + Good standing → + Frigates
+---
 
-&#x20; - + Excellent standing → + Destroyers / Cruisers / Battlecruisers
-
-\- Shelter \*\*owner\*\* always has full access to every ship.
-
-\- All checks happen on-chain in one transaction (official `world::standing` + `world::tribe`).
-
-\- Full error detection and clear feedback for players.
-
-
-
-Works with \*\*both\*\* core Shelter and Heavy Shelter Object IDs.
-
-
-
-\## Tech Stack
-
-\- Sui Move (custom Smart Assembly)
-
-\- Official EVE Frontier world-contracts
-
-\- React + @mysten/dapp-kit frontend
-
-\- Built on official `builder-scaffold` (March 2026)
-
-
-
-\## How to test / deploy
-
-1\. Clone this repo + follow the scaffold README.
-
-2\. Run `pnpm tsx ts-scripts/deploy-smartshelters.ts` to create a shelter.
-
-3\. Deploy frontend (`pnpm dev` or Vercel).
-
-4\. Paste any Shelter/Heavy Shelter Object ID → swap ships.
-
-
-
-\## Live Demo
-
-\[Deployed URL — put your Vercel link here]
-
-
-
-\## Screenshots / Video
-
-(Attach 2–3 screenshots or a short Loom video here)
-
-
-
-\## Team
-
-\- Solo / Brettius
-
-
-
-\*\*Submitted for the DeepSurge EVE Frontier Hackathon 2026\*\*  
-
-Built in < 24 hours using the official scaffold and tutorials.
-
-Last updated: April 1, 2026 (Redeploy triggered)
-
-
-
-Made with love for the Frontier community 🚀
-
+**Submitted for the DeepSurge EVE Frontier Hackathon 2026**
