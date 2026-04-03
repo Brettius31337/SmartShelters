@@ -3,7 +3,9 @@ import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransa
 import { Transaction } from '@mysten/sui/transactions';
 
 function App() {
-  const [shelters, setShelters] = useState([]);
+  // Hardcoded to your specific Shelter for Phase 1
+  const HARDCODED_SHELTER_ID = '0xa5bf5396398cec9433e63019235174a0461b09952c73da71b96eb3b9e6e9091a';
+
   const [selectedShelter, setSelectedShelter] = useState(null);
   const [ships, setShips] = useState([]);
   const [shipId, setShipId] = useState('');
@@ -14,11 +16,10 @@ function App() {
   const client = useSuiClient();
   const { mutate: executeTx } = useSignAndExecuteTransaction();
 
-  // Auto-load user's shelters when wallet connects
+  // Load your specific Shelter (Phase 1 - hardcoded)
   useEffect(() => {
-    const fetchOwnedShelters = async () => {
+    const loadShelter = async () => {
       if (!account) {
-        setShelters([]);
         setSelectedShelter(null);
         setShips([]);
         setLoading(false);
@@ -29,41 +30,33 @@ function App() {
       setError('');
 
       try {
-        const result = await client.getOwnedObjects({
-          owner: account.address,
-          filter: {
-            StructType: '0x0::smartshelters::smartshelters::SmartShelter'
-          },
+        const result = await client.getObject({
+          id: HARDCODED_SHELTER_ID,
           options: { showContent: true }
         });
 
-        const owned = result.data.map(obj => ({
-          id: obj.data.objectId,
-          ships: obj.data.content?.fields?.ships || []
-        }));
-
-        setShelters(owned);
-
-        if (owned.length === 1) {
-          setSelectedShelter(owned[0]);
-          setShips(owned[0].ships);
-        } else if (owned.length > 1) {
-          setSelectedShelter(owned[0]);
-          setShips(owned[0].ships);
+        if (result.data) {
+          const shelterData = {
+            id: result.data.objectId,
+            ships: result.data.content?.fields?.ships || [],
+            owner: result.data.content?.fields?.owner
+          };
+          setSelectedShelter(shelterData);
+          setShips(shelterData.ships);
         }
       } catch (err) {
         console.error(err);
-        setError('Failed to load shelters. Make sure you are connected to the correct network.');
+        setError('Failed to load your Shelter. Make sure you are connected to the correct network.');
       }
       setLoading(false);
     };
 
-    fetchOwnedShelters();
+    loadShelter();
   }, [account?.address, client]);
 
   async function depositShip() {
     if (!selectedShelter || !shipId) {
-      setError('Select shelter and enter ship ID');
+      setError('Enter a ship ID to deposit');
       return;
     }
     setError('');
@@ -71,7 +64,7 @@ function App() {
     tx.moveCall({
       target: '0x0::smartshelters::smartshelters::swap_ship',
       arguments: [
-        tx.object(selectedShelter.id),
+        tx.object(HARDCODED_SHELTER_ID),
         tx.pure(shipId),
         tx.pure(true)
       ],
@@ -81,8 +74,8 @@ function App() {
         transactionBlock: tx,
       });
       console.log('Deposit:', result);
-      // Refetch shelters
-      fetchOwnedShelters();
+      // Refresh data
+      window.location.reload();
     } catch (err) {
       setError('Deposit failed: ' + (err.message || err));
     }
@@ -98,7 +91,7 @@ function App() {
     tx.moveCall({
       target: '0x0::smartshelters::smartshelters::swap_ship',
       arguments: [
-        tx.object(selectedShelter.id),
+        tx.object(HARDCODED_SHELTER_ID),
         tx.pure(shipId),
         tx.pure(false)
       ],
@@ -108,7 +101,8 @@ function App() {
         transactionBlock: tx,
       });
       console.log('Withdraw:', result);
-      fetchOwnedShelters();
+      // Refresh data
+      window.location.reload();
     } catch (err) {
       setError('Withdraw failed: ' + (err.message || err));
     }
@@ -134,36 +128,14 @@ function App() {
 
       {account && (
         <div style={{ marginTop: '30px', width: '100%', maxWidth: '700px' }}>
-          {loading && <div>Loading your shelters...</div>}
+          {loading && <div>Loading your Shelter...</div>}
           {error && <div style={{color:'red'}}>{error}</div>}
 
-          {shelters.length === 0 && !loading && (
-            <div>No SmartShelters found in this wallet.</div>
-          )}
-
-          {shelters.length > 0 && (
+          {selectedShelter && (
             <div>
-              <div style={{marginBottom: '15px'}}>
-                Owned Shelters: {shelters.length}
+              <div style={{ marginBottom: '20px', color: '#0f0', fontSize: '1.1em' }}>
+                Using Shelter: {HARDCODED_SHELTER_ID.slice(0,8)}...{HARDCODED_SHELTER_ID.slice(-6)}
               </div>
-
-              <select 
-                value={selectedShelter?.id || ''}
-                onChange={(e) => {
-                  const shelter = shelters.find(s => s.id === e.target.value);
-                  if (shelter) {
-                    setSelectedShelter(shelter);
-                    setShips(shelter.ships);
-                  }
-                }}
-                style={{ width: '100%', padding: '12px', background: '#111', color: '#0f0', border: '1px solid #0f0', marginBottom: '20px' }}
-              >
-                {shelters.map(s => (
-                  <option key={s.id} value={s.id}>
-                    {s.id.slice(0,8)}...{s.id.slice(-6)} ({s.ships.length} ships)
-                  </option>
-                ))}
-              </select>
 
               <div style={{ background: '#111', padding: '20px', border: '1px solid #0f0' }}>
                 <h3>Ships in Shelter</h3>
@@ -210,8 +182,7 @@ function App() {
 
       {!account && (
         <div style={{marginTop: '40px', color:'#555', textAlign:'center'}}>
-          Connect your Sui wallet to automatically load your SmartShelters<br/>
-          (no manual ID entry required)
+          Connect your Sui wallet to access your Smart Shelter
         </div>
       )}
     </div>
