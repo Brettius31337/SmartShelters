@@ -1,53 +1,55 @@
 # SmartShelters — EVE Frontier × Sui
 
-**A tribe-agnostic Smart Assembly for secure ship storage in Shelters & Heavy Shelters.**
+**A Smart Storage-hosted dApp for advanced ship management in Shelters & Heavy Shelters.**
 
-Built for the EVE Frontier ecosystem after the Sui migration (March 2026).
+Submitted for the DeepSurge EVE Frontier Hackathon 2026.
 
-## What it does
+### What it does
 
-- Anyone can create a **Smart Shelter** (no manual tribe input required).
-- Automatically detects the owner's current tribe using official `world::tribe`.
-- Tiered access based on **personal standings** set by the shelter owner:
-  - Basic tribe members → Shuttles / Corvettes
-  - Good standing → + Frigates
-  - Excellent standing → + Destroyers, Cruisers, Battlecruisers
-- Shelter **owner** always has full access to all stored ships.
-- All logic (including standing checks) happens on-chain in a single transaction.
-- Supports both standard Shelters and Heavy Shelters.
+This dApp is hosted on a **Smart Storage Unit** and provides enhanced ship storage and management for official Shelters and Heavy Shelters.
 
-Ships can be deposited and withdrawn using the clean React frontend.
+- Currently supports depositing and withdrawing ships from a configured Shelter.
+- Uses dynamic fields on the official `world::assembly::Assembly` for storage.
+- Clean, dark sci-fi interface optimized for in-game use.
+- Designed to eventually support tribe membership and standings-based access control (owner = full access, tribe members get tiered access to ship classes).
 
-## Features
+The dApp is intentionally hosted on a Smart Storage Unit because attaching dApps directly to Shelters has proven unreliable in the current game build.
 
-- Fully on-chain access control using official EVE Frontier contracts
-- Automatic loading of owned shelters when wallet connects
-- Simple deposit/withdraw UI with real-time feedback
-- Compatible with zkLogin and sponsored transactions
-- Clean, dark sci-fi UI styled for the Frontier
+### Features
 
-## Tech Stack
+- Hosted on Smart Storage Unit (reliable dApp attachment point)
+- Controls any Shelter or Heavy Shelter (configurable via settings gear — owner only)
+- Real-time ship deposit and withdrawal
+- Clean monospace UI styled for EVE Frontier
+- Built with latest post-migration Sui + dapp-kit patterns
+- Persistent configuration using browser localStorage
 
-- **Smart Contract**: Sui Move (Smart Assembly)
-- **Frontend**: React + TypeScript + Vite
-- **Wallet & Blockchain**: `@mysten/dapp-kit` + `@mysten/sui`
-- **Styling**: Inline + custom dark theme
-- **Deployment**: Vercel (auto-deploys on push to `main`)
+### How to Use
 
-## How to Test / Deploy
-
-1. Clone the repo
-2. `npm install`
-3. `npm run dev` for local development
-4. Deploy the Move module using the deploy script
-5. Push to GitHub → automatic Vercel deployment
+1. Deploy the frontend (already live on Vercel).
+2. In-game, find a Smart Storage Unit you own.
+3. Add the Vercel URL as the dApp link on that Storage Unit.
+4. Connect your wallet in the dApp.
+5. (Optional) Click the ⚙️ gear (only visible to the Storage Unit owner) to configure which Shelter it controls.
 
 Live Demo: https://smart-shelters-8nz70k015-brettius31337s-projects.vercel.app/
 
-## Live Demo
+### Tech Stack
 
-https://smart-shelters-8nz70k015-brettius31337s-projects.vercel.app/
+- **Frontend**: React + TypeScript + Vite
+- **Wallet & Blockchain**: `@mysten/dapp-kit` + `@mysten/sui`
+- **Smart Contract**: Sui Move with dynamic fields on official `world::assembly::Assembly`
+- **Styling**: Custom dark sci-fi theme
+- **Deployment**: Vercel (auto-deploys on `main`)
 
----
+### Future Plans
 
-**Submitted for the DeepSurge EVE Frontier Hackathon 2026**
+- Full tribe membership and standings-based access control (Shuttles/Corvettes → Frigates/Destroyers → Cruisers/Battlecruisers based on standing)
+- Drag & drop ship management
+- Support for multiple controlled Shelters
+- Board and repackage functions
+
+**Submitted for the DeepSurge EVE Frontier Hackathon 2026**  
+Category: Utility + Live Frontier Integration
+
+Made for the Frontier community.
