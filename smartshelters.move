@@ -3,14 +3,10 @@ module smartshelters::smartshelters {
     use sui::tx_context::{Self, TxContext};
     use sui::transfer;
     use sui::event;
-    # use world::assembly::{Self, Assembly}; // Stub for build
-    # use world::access::OwnerCap; // Stub
-
-    struct SmartShelter has key {
-        id: UID,
-        owner: address,
-        ships: vector<address>,
-    }
+    use sui::table::{Self, Table};
+    use sui::dynamic_field;
+    use world::assembly::Assembly;
+    use world::access::OwnerCap;
 
     struct ShipSwapped has copy, drop { 
         player: address, 
@@ -18,26 +14,36 @@ module smartshelters::smartshelters {
         action: vector<u8> 
     };
 
-    public entry fun create_shelter(ctx: &mut TxContext) {
-        let owner = tx_context::sender(ctx);
-        let shelter = SmartShelter {
-            id: object::new(ctx),
-            owner,
-            ships: vector::empty(),
-        };
-        transfer::public_share_object(shelter);
+    // Storage for ships per Shelter (using dynamic field on the Assembly)
+    struct ShipStorage has store {
+        ships: vector<address>,
     }
 
-    public entry fun swap_ship(
-        shelter: &mut SmartShelter,
+    // New function for official Shelters (Phase 1.5)
+    public entry fun swap_ship_on_assembly(
+        shelter: &mut Assembly,
         ship: address,
         is_deposit: bool,
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
+        let key = b"smartshelters_storage";
+
+        if (!dynamic_field::exists_(&shelter.id, key)) {
+            dynamic_field::add(&mut shelter.id, key, ShipStorage {
+                ships: vector::empty(),
+            });
+        };
+
+        let storage = dynamic_field::borrow_mut<vector<u8>, ShipStorage>(&mut shelter.id, key);
 
         if (is_deposit) {
-            vector::push_back(&mut shelter.ships, ship);
+            vector::push_back(&mut storage.ships, ship);
+        } else {
+            let (found, idx) = vector::index_of(&storage.ships, &ship);
+            if (found) {
+                vector::remove(&mut storage.ships, idx);
+            };
         };
 
         event::emit(ShipSwapped { 
@@ -47,20 +53,22 @@ module smartshelters::smartshelters {
         });
     }
 
-    public fun view_ships(shelter: &SmartShelter): vector<address> {
-        shelter.ships
+    public fun view_ships(shelter: &Assembly): vector<address> {
+        let key = b"smartshelters_storage";
+        if (dynamic_field::exists_(&shelter.id, key)) {
+            let storage = dynamic_field::borrow<vector<u8>, ShipStorage>(&shelter.id, key);
+            storage.ships
+        } else {
+            vector::empty()
+        }
     }
 
-    // Compatible with official anchor system
+    // TODO: Add tribe + standings checks here in future phases
     public fun anchor_to_shelter(
-        shelter: &mut SmartShelter,
-        assembly: Assembly,
+        shelter: &mut Assembly,
         owner_cap: &OwnerCap<Assembly>,
         ctx: &mut TxContext
     ) {
-        // TODO: Impl real anchor + tribe/standing checks:
-    // - world::tribe::is_member(ctx, shelter.tribe_id, sender)
-    // - standing::tier(shelter.standings, sender) >= required_for(ship_tier)
-        // This is a stub for compatibility
+        // Future: implement tribe/standing logic
     }
 }

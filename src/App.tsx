@@ -62,7 +62,7 @@ function App() {
     setError('');
     const tx = new Transaction();
     tx.moveCall({
-      target: '0x0::smartshelters::smartshelters::swap_ship',
+      target: '0x0::smartshelters::smartshelters::swap_ship_on_assembly',
       arguments: [
         tx.object(HARDCODED_SHELTER_ID),
         tx.pure(shipId),
@@ -89,7 +89,7 @@ function App() {
     setError('');
     const tx = new Transaction();
     tx.moveCall({
-      target: '0x0::smartshelters::smartshelters::swap_ship',
+      target: '0x0::smartshelters::smartshelters::swap_ship_on_assembly',
       arguments: [
         tx.object(HARDCODED_SHELTER_ID),
         tx.pure(shipId),
