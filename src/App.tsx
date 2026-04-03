@@ -3,8 +3,9 @@ import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransa
 import { Transaction } from '@mysten/sui/transactions';
 
 function App() {
-  // Hardcoded to your specific Shelter for Phase 1
-  const HARDCODED_SHELTER_ID = '0xa5bf5396398cec9433e63019235174a0461b09952c73da71b96eb3b9e6e9091a';
+  // === PATH B: DApp hosted on Smart Storage Unit, controlling Shelter ===
+  const STORAGE_UNIT_ID = '0xd27c1b6100ae66ad297be3c74702dee0aef82f337a016e104b9e22aba0ee11d1';
+  const SHELTER_ID = '0xa5bf5396398cec9433e63019235174a0461b09952c73da71b96eb3b9e6e9091a';
 
   const [selectedShelter, setSelectedShelter] = useState(null);
   const [ships, setShips] = useState([]);
@@ -30,8 +31,9 @@ function App() {
       setError('');
 
       try {
+        // Load the Shelter we are controlling
         const result = await client.getObject({
-          id: HARDCODED_SHELTER_ID,
+          id: SHELTER_ID,
           options: { showContent: true }
         });
 
@@ -64,7 +66,7 @@ function App() {
     tx.moveCall({
       target: '0x0::smartshelters::smartshelters::swap_ship_on_assembly',
       arguments: [
-        tx.object(HARDCODED_SHELTER_ID),
+        tx.object(SHELTER_ID),
         tx.pure(shipId),
         tx.pure(true)
       ],
@@ -91,7 +93,7 @@ function App() {
     tx.moveCall({
       target: '0x0::smartshelters::smartshelters::swap_ship_on_assembly',
       arguments: [
-        tx.object(HARDCODED_SHELTER_ID),
+        tx.object(SHELTER_ID),
         tx.pure(shipId),
         tx.pure(false)
       ],
@@ -133,8 +135,11 @@ function App() {
 
           {selectedShelter && (
             <div>
+              <div style={{ marginBottom: '10px', color: '#0f0', fontSize: '1.1em' }}>
+                DApp hosted on Storage Unit: {STORAGE_UNIT_ID.slice(0,8)}...{STORAGE_UNIT_ID.slice(-6)}
+              </div>
               <div style={{ marginBottom: '20px', color: '#0f0', fontSize: '1.1em' }}>
-                Using Shelter: {HARDCODED_SHELTER_ID.slice(0,8)}...{HARDCODED_SHELTER_ID.slice(-6)}
+                Controlling Shelter: {SHELTER_ID.slice(0,8)}...{SHELTER_ID.slice(-6)}
               </div>
 
               <div style={{ background: '#111', padding: '20px', border: '1px solid #0f0' }}>
